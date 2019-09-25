@@ -9,19 +9,19 @@ import com.guilherme.json_diff.dto.DifferenceResultDTO;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-public class JsonParser implements Parser {
+public class JsonProcessor implements Processor {
 
     @Override
     public DifferenceResultDTO getDifference(String file1, String file2) {
-        return new JsonProcessor(file1, file2).getDifference();
+        return new helper(file1, file2).getDifference();
     }
 
-    private class JsonProcessor {
+    private class helper {
 
         private final String json1;
         private final String json2;
 
-        public JsonProcessor(String json1, String json2) {
+        public helper(String json1, String json2) {
             this.json1 = json1;
             this.json2 = json2;
         }
@@ -51,10 +51,19 @@ public class JsonParser implements Parser {
             return builder.build();
         }
 
-        private int getStringSizeInBytes(String file){
+        /**
+         * Get the size in byte of an string
+         */
+        private int getStringSizeInBytes(String file) {
             return file.getBytes().length;
         }
 
+        /**
+         * Convert a string into parsed json map
+         *
+         * @param json json text to be parsed
+         * @return A Map that represents json values
+         */
         private Map<String, Object> convert(String json) {
             Gson g = new Gson();
             Type mapType = new TypeToken<Map<String, Object>>() {
@@ -63,6 +72,10 @@ public class JsonParser implements Parser {
         }
 
 
+        /**
+         * Generate a immutable result of changes in two maps.
+         * GUAVA
+         */
         private MapDifference<String, Object> diff(Map<String, Object> left, Map<String, Object> right) {
 
             return Maps.difference(left, right);

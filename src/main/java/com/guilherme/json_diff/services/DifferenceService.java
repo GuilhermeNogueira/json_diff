@@ -43,6 +43,10 @@ public class DifferenceService {
         repository.save(diff);
     }
 
+    /**
+     * Start diff process.
+     * Calls file's comparator (based on it's type) with decoded values;
+     */
     public DifferenceResultDTO diff(Long id) {
         Map<Side, Difference> differenceMap = prepareDiff(id);
 
@@ -60,6 +64,14 @@ public class DifferenceService {
                 );
     }
 
+
+    /**
+     * Based on ID, find a pair of difference and do validations:
+     * - Id Exists.
+     * - Both sides (RIGHT AND LEFT) are present.
+     *
+     * @return A Map with difference.SIDE as key and difference as value
+     */
     private Map<Side, Difference> prepareDiff(Long id) {
         List<Difference> results = repository.getByKeyId(id);
 
@@ -68,6 +80,7 @@ public class DifferenceService {
         }
 
         if (results.size() != 2) {
+            /* Finding which side is missing. */
             Side missingSide = results.stream()
                     .findFirst()
                     .map(r -> r.getKey().getSide() == Side.LEFT ? Side.LEFT : Side.RIGHT)
